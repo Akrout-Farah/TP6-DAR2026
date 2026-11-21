@@ -24,48 +24,27 @@ Un serveur gère l'ensemble des comptes. Chaque compte est défini par un **code
 ## 2. Environnement
 
 - JDK 8 (version 1.8.0, avec le compilateur IDL `idlj` 3.2)
-- Visual Studio Code (avec l'extension Extension Pack for Java)
-
-## 3. Structure du dépôt
-
-```
-farah-akrout_LSI3_DevAppRepartie/
-├── README.md
-├── captures/                      (captures d'écran du README)
-├── TP6_CorbaBanque_Server/
-│   └── src/
-│       ├── Banque.idl
-│       ├── jndi.properties
-│       ├── corbaBanque/
-│       ├── service/BanqueImpl.java
-│       └── corbaServer/BanqueServer.java
-└── TP6_CorbaBanque_Client/
-    └── src/
-        ├── Banque.idl
-        ├── jndi.properties
-        ├── corbaBanque/
-        └── corbaClient/BanqueClient.java
-```
+- Visual Studio Code
 
 ---
 
-## 4. Étape 1 : Préparation de l'espace de travail
+## 3. Étape 1 : Préparation de l'espace de travail
 
 Vérification de l'environnement : le JDK 8 est installé et configuré dans le PATH. Les commandes `java -version` et `idlj -version` répondent correctement.
 
-![Vérification du JDK 8 et de idlj](captures/Capture_d_écran_2026-11-19_012238.png)
+![Vérification du JDK 8 et de idlj](captures/01-jdk.png)
 
 ---
 
-## 5. Étape 2 : Développement du serveur
+## 4. Étape 2 : Développement du serveur
 
-### 5.1 Création du projet
+### 4.1 Création du projet
 
 Création du projet Java `TP6_CorbaBanque_Server`. La capture montre son contenu après la compilation de l'IDL : le dossier `corbaBanque` (code généré par `idlj`), le servant dans le package `service`, le serveur dans le package `corbaServer`, ainsi que `Banque.idl` et `jndi.properties` dans `src`.
 
-![Arborescence du projet serveur](captures/Capture_d_écran_2026-11-19_012131.png)
+![Arborescence du projet serveur](captures/02-projet-server.png)
 
-### 5.2 Interface IDL
+### 4.2 Interface IDL
 
 Le fichier `Banque.idl` (dans `src`) déclare :
 
@@ -74,9 +53,9 @@ Le fichier `Banque.idl` (dans `src`) déclare :
 - le type `tabComptes`, une séquence de comptes (`typedef sequence<Compte> tabComptes`) ;
 - l'interface `IBanqueRemote` avec les méthodes distantes `creerCompte`, `verser`, `retirer`, `getCompte`, `getComptes` et `conversion`.
 
-![Fichier Banque.idl](captures/Capture_d_écran_2026-11-19_012305.png)
+![Fichier Banque.idl](captures/03-banque-idl.png)
 
-### 5.3 Implémentation du servant
+### 4.3 Implémentation du servant
 
 La classe `service.BanqueImpl` hérite de `IBanqueRemotePOA` et implémente les méthodes de `IBanqueRemoteOperations`. Les comptes sont stockés dans une `HashMap` indexée par le code du compte.
 
@@ -87,7 +66,7 @@ La classe `service.BanqueImpl` hérite de `IBanqueRemotePOA` et implémente les 
 - `getComptes` renvoie le tableau de tous les comptes.
 - `conversion` convertit un montant en euros en dinars avec un taux fixe de 3,40 DT pour 1 €.
 
-### 5.4 Configuration JNDI
+### 4.4 Configuration JNDI
 
 Le fichier `jndi.properties` (dans `src`) indique l'adresse de l'annuaire de noms :
 
@@ -96,7 +75,7 @@ java.naming.factory.initial = com.sun.jndi.cosnaming.CNCtxFactory
 java.naming.provider.url = iiop://localhost:900
 ```
 
-### 5.5 Développement du serveur
+### 4.5 Développement du serveur
 
 La classe `corbaServer.BanqueServer` :
 
@@ -109,7 +88,7 @@ La classe `corbaServer.BanqueServer` :
 
 ---
 
-## 6. Étape 3 : Développement du client
+## 5. Étape 3 : Développement du client
 
 1. Création du projet Java `TP6_CorbaBanque_Client`.
 2. Copie de `Banque.idl` et de `jndi.properties` dans `TP6_CorbaBanque_Client/src`.
@@ -120,15 +99,15 @@ La classe `corbaServer.BanqueServer` :
    - la convertit en stub avec `IBanqueRemoteHelper.narrow(...)` ;
    - appelle à distance chacune des méthodes du service bancaire pour les tester.
 
-![Arborescence du projet client](captures/Capture_d_écran_2026-11-19_012024.png)
+![Arborescence du projet client](captures/04-projet-client.png)
 
 ---
 
-## 7. Étape 4 : Exécution de l'application
+## 6. Étape 4 : Exécution de l'application
 
 L'exécution respecte l'ordre d'initialisation : annuaire, puis serveur, puis client.
 
-### 7.1 Lancement de l'annuaire de noms
+### 6.1 Lancement de l'annuaire de noms
 
 La commande `tnameserv` lance la classe `TransientNameServer`. Sur ma machine, elle annonçait l'adresse réseau du poste (`10.26.13.162`), qui n'était pas joignable (message `Connection timed out`). J'ai donc lancé la même classe directement, en forçant l'adresse locale `127.0.0.1`, sur le port 900 prévu dans `jndi.properties` :
 
@@ -138,23 +117,23 @@ java "-Dcom.sun.CORBA.ORBServerHost=127.0.0.1" com.sun.corba.se.impl.naming.cosn
 
 L'annuaire affiche son contexte de dénomination initial, configure le port 900, puis indique **Prêt**.
 
-![Annuaire de noms démarré sur le port 900](captures/Capture_d_écran_2026-11-19_013246.png)
+![Annuaire de noms démarré sur le port 900](captures/05-annuaire.png)
 
-### 7.2 Lancement du serveur
+### 6.2 Lancement du serveur
 
 Exécution de la classe `BanqueServer`. Pour la même raison que ci-dessus, l'ORB du serveur est initialisé avec la propriété `com.sun.CORBA.ORBServerHost` fixée à `127.0.0.1`, afin que la référence enregistrée dans l'annuaire soit joignable. Le serveur affiche « Serveur Banque prêt, en attente des clients... ».
 
-![Serveur démarré](captures/Capture_d_écran_2026-11-19_013332.png)
+![Serveur démarré](captures/06-serveur.png)
 
-### 7.3 Lancement du client
+### 6.3 Lancement du client
 
 Exécution de la classe `BanqueClient`, qui teste chaque méthode distante.
 
-![Résultat de l'exécution du client](captures/Capture_d_écran_2026-11-19_012811.png)
+![Résultat de l'exécution du client](captures/07-client.png)
 
 ---
 
-## 8. Résultats des tests
+## 7. Résultats des tests
 
 | N°  | Test                                                | Résultat obtenu                    |
 | --- | --------------------------------------------------- | ---------------------------------- |
@@ -171,9 +150,3 @@ Exécution de la classe `BanqueClient`, qui teste chaque méthode distante.
 - Le taux de conversion Euro vers Dinar est fixe (3,40) et sert uniquement à la démonstration.
 - Un retrait supérieur au solde est ignoré par le serveur : le solde reste inchangé.
 - Les données sont conservées en mémoire : elles sont perdues à l'arrêt du serveur.
-
-## 10. Lancer le projet
-
-1. Lancer l'annuaire (voir section 7.1) et laisser le terminal ouvert.
-2. Exécuter `TP6_CorbaBanque_Server/src/corbaServer/BanqueServer.java`.
-3. Exécuter `TP6_CorbaBanque_Client/src/corbaClient/BanqueClient.java`.
