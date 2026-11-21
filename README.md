@@ -105,6 +105,8 @@ La classe `corbaServer.BanqueServer` :
 
 ## 6. Étape 4 : Exécution de l'application
 
+![Erreur au lancement de tnameserv (port 900 déjà utilisé)](captures/08-tnameserv-erreur.png)
+
 L'exécution respecte l'ordre d'initialisation : annuaire, puis serveur, puis client.
 
 ### 6.1 Lancement de l'annuaire de noms
